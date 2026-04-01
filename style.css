@@ -1,0 +1,391 @@
+:root {
+  --bg-top: #f4f8ea;
+  --bg-bottom: #d9e8bb;
+  --panel: rgba(250, 252, 244, 0.9);
+  --panel-strong: rgba(255, 255, 255, 0.78);
+  --ink: #27321f;
+  --muted: #617155;
+  --line: rgba(74, 102, 55, 0.16);
+  --board: #a9bf83;
+  --cell: rgba(255, 255, 255, 0.42);
+  --snake: #5e8f43;
+  --snake-head: #3c6e2b;
+  --food: #d95d39;
+  --shadow: 0 20px 50px rgba(81, 107, 53, 0.16);
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  padding: 18px;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.86), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(255, 245, 230, 0.5), transparent 24%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+}
+
+.game-shell {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.hero-card,
+.board-card,
+.control-card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.hero-card {
+  padding: 24px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.eyebrow,
+.status-label,
+.control-note {
+  margin: 0;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  margin-top: 8px;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  margin-top: 12px;
+  max-width: 36ch;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.ghost-button,
+.reset-button,
+.dpad-button {
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.ghost-button,
+.reset-button {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 16px;
+  font-weight: 800;
+}
+
+.ghost-button {
+  background: rgba(39, 50, 31, 0.08);
+  color: var(--ink);
+}
+
+.reset-button {
+  background: linear-gradient(180deg, #6d9b4e, #4f7c34);
+  color: #fdfdf8;
+}
+
+.ghost-button:hover,
+.reset-button:hover,
+.dpad-button:hover {
+  opacity: 0.95;
+}
+
+.ghost-button:active,
+.reset-button:active,
+.dpad-button:active {
+  transform: translateY(1px);
+}
+
+.play-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 18px;
+}
+
+.board-card,
+.control-card {
+  padding: 22px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.status-card {
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+}
+
+.status-value {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  font-weight: 900;
+}
+
+.status-copy {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+}
+
+.board-frame {
+  position: relative;
+  margin-top: 18px;
+}
+
+.board {
+  --grid-size: 14;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px;
+  background: linear-gradient(180deg, #acc186, #9ab173);
+  border-radius: 24px;
+  user-select: none;
+  -webkit-user-select: none;
+  aspect-ratio: 1 / 1;
+}
+
+.board-frame.is-paused .board {
+  opacity: 0.72;
+}
+
+.cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: var(--cell);
+}
+
+.cell-snake,
+.cell-head,
+.cell-food {
+  position: relative;
+}
+
+.cell-snake {
+  background: var(--snake);
+}
+
+.cell-head {
+  background: var(--snake-head);
+}
+
+.cell-food {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.cell-food::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 999px;
+  background: var(--food);
+}
+
+.overlay {
+  position: absolute;
+  inset: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(39, 50, 31, 0.4);
+  backdrop-filter: blur(5px);
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-card {
+  width: min(100%, 320px);
+  padding: 22px 20px;
+  border-radius: 24px;
+  background: rgba(253, 253, 248, 0.96);
+  text-align: center;
+}
+
+.overlay-eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.overlay-card h2 {
+  margin-top: 10px;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+}
+
+.overlay-copy {
+  margin-top: 10px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.overlay-button {
+  margin-top: 18px;
+  width: 100%;
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.control-copy {
+  margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.control-copy p + p {
+  margin-top: 10px;
+}
+
+.control-copy strong {
+  color: var(--ink);
+}
+
+.dpad {
+  margin-top: 22px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+}
+
+.dpad-row {
+  display: flex;
+  gap: 10px;
+}
+
+.dpad-button {
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f0f4e5, #dfe8cf);
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+@media (max-width: 920px) {
+  .play-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 8px;
+  }
+
+  .hero-card,
+  .board-card,
+  .control-card {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .hero-card,
+  .control-header {
+    flex-direction: column;
+  }
+
+  .hero-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .ghost-button,
+  .reset-button {
+    flex: 1 1 0;
+  }
+
+  .status-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .status-card-wide {
+    grid-column: 1 / -1;
+  }
+
+  .board {
+    gap: 4px;
+    padding: 8px;
+    border-radius: 18px;
+  }
+
+  .cell {
+    border-radius: 6px;
+  }
+
+  .overlay {
+    inset: 8px;
+    border-radius: 18px;
+  }
+
+  .dpad {
+    margin-top: 16px;
+  }
+
+  .dpad-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost-button,
+  .reset-button,
+  .dpad-button {
+    transition: none;
+  }
+}
