@@ -1,5 +1,5 @@
 const GRID_SIZE = 14;
-const TICK_MS = 150;
+const TICK_MS = 220;
 
 const DIRECTIONS = Object.freeze({
   up: { row: -1, col: 0 },
