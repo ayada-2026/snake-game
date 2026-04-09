@@ -3,79 +3,141 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#d8eabc">
-  <title>Snake 게임</title>
+  <meta name="theme-color" content="#f5eddc">
+  <title>Habit Garden</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <main class="game-shell">
-    <section class="hero-card">
-      <div class="hero-copy">
-        <p class="eyebrow">Classic Arcade</p>
-        <h1>Snake</h1>
-        <p class="subtitle">
-          먹이를 먹을수록 길어집니다. 벽이나 자기 몸에 닿으면 종료됩니다.
-        </p>
-      </div>
-
-      <div class="hero-actions">
-        <button type="button" class="ghost-button" id="pauseButton">일시정지</button>
-        <button type="button" class="reset-button" id="restartButton">다시 시작</button>
-      </div>
-    </section>
-
-    <section class="play-layout">
-      <section class="board-card">
-        <div class="status-row">
-          <article class="status-card">
-            <span class="status-label">SCORE</span>
-            <strong class="status-value" id="scoreText">0</strong>
-          </article>
-          <article class="status-card">
-            <span class="status-label">LENGTH</span>
-            <strong class="status-value" id="lengthText">3</strong>
-          </article>
-          <article class="status-card status-card-wide">
-            <span class="status-label">STATE</span>
-            <strong class="status-value status-copy" id="statusText">진행 중</strong>
-          </article>
+  <main class="garden-app">
+    <section class="app-shell" aria-labelledby="pageTitle">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Habit Garden</p>
+          <h1 id="pageTitle">작은 반복을 키우는 습관 정원</h1>
+          <p class="hero-text">하루 한 장씩 넘기며 오늘의 습관을 가볍게 돌봐보세요.</p>
         </div>
 
-        <div class="board-frame" id="boardFrame">
-          <div class="board" id="gameBoard" aria-label="Snake 게임 보드" role="grid"></div>
+        <section class="hero-status" aria-labelledby="insightTitle">
+          <p class="hero-date" id="todayLabel"></p>
+          <p class="hero-kicker">오늘의 정원 상태</p>
+          <h2 class="hero-title" id="insightTitle">오늘의 첫 물주기를 기다리고 있어요</h2>
+          <p class="hero-note" id="insightText">가장 쉬운 습관 하나부터 체크하면 리듬이 금방 살아나요.</p>
 
-          <div class="overlay hidden" id="overlay" aria-live="polite">
-            <div class="overlay-card">
-              <p class="overlay-eyebrow" id="overlayEyebrow">게임 종료</p>
-              <h2 id="overlayTitle">다시 시작해 보세요</h2>
-              <p class="overlay-copy" id="overlayCopy">먹이를 모으며 점수를 더 높일 수 있습니다.</p>
-              <button type="button" class="reset-button overlay-button" id="overlayRestartButton">한 판 더 하기</button>
-            </div>
+          <div class="summary-grid" aria-label="오늘 요약">
+            <article class="summary-card">
+              <span class="summary-label">활성 습관</span>
+              <strong class="summary-value" id="activeCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">오늘 완료</span>
+              <strong class="summary-value" id="doneTodayCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">최장 기록</span>
+              <strong class="summary-value" id="strongestStreak">0일</strong>
+            </article>
+            <article class="summary-card">
+              <span class="summary-label">주간 달성</span>
+              <strong class="summary-value" id="weeklyRate">0%</strong>
+            </article>
           </div>
+        </section>
+      </header>
+
+      <section class="carousel-card" aria-labelledby="habitsTitle">
+        <div class="section-head section-head-tight">
+          <div>
+            <p class="section-kicker">Garden Cards</p>
+            <h2 id="habitsTitle">오늘 돌볼 습관</h2>
+          </div>
+          <p class="section-note">한 장씩 넘기며 지금 필요한 습관에만 집중해보세요.</p>
+        </div>
+
+        <div class="carousel-frame">
+          <div class="empty-carousel is-hidden" id="emptyState">
+            <p class="empty-eyebrow">Start Small</p>
+            <h3>첫 습관을 심어볼까요?</h3>
+            <p>아래에서 새 습관을 추가하면 정원 카드가 바로 생겨나요.</p>
+          </div>
+
+          <div class="habit-track" id="habitTrack" aria-label="습관 카드 캐러셀"></div>
+        </div>
+
+        <div class="carousel-footer">
+          <button type="button" class="nav-button" id="prevHabit" aria-label="이전 습관">이전</button>
+
+          <div class="carousel-indicator" aria-live="polite">
+            <span class="page-count" id="carouselCount">0 / 0</span>
+            <div class="page-dots" id="pageDots" aria-label="습관 위치"></div>
+          </div>
+
+          <button type="button" class="nav-button" id="nextHabit" aria-label="다음 습관">다음</button>
         </div>
       </section>
 
-      <aside class="control-card">
-        <div class="control-header">
-          <h2>조작</h2>
-          <p class="control-note">방향키 / WASD / Space</p>
-        </div>
-
-        <div class="control-copy">
-          <p>방향키 또는 <strong>WASD</strong>로 머리를 움직입니다.</p>
-          <p><strong>Space</strong> 또는 <strong>P</strong>로 일시정지할 수 있습니다.</p>
-          <p>모바일에서는 아래 버튼으로 방향을 바꿀 수 있습니다.</p>
-        </div>
-
-        <div class="dpad" aria-label="방향 버튼">
-          <button type="button" class="dpad-button dpad-up" data-direction="up" aria-label="위로 이동">▲</button>
-          <div class="dpad-row">
-            <button type="button" class="dpad-button" data-direction="left" aria-label="왼쪽으로 이동">◀</button>
-            <button type="button" class="dpad-button" data-direction="down" aria-label="아래로 이동">▼</button>
-            <button type="button" class="dpad-button" data-direction="right" aria-label="오른쪽으로 이동">▶</button>
+      <section class="composer-card" aria-labelledby="composerTitle">
+        <div class="section-head section-head-tight">
+          <div>
+            <p class="section-kicker">New Habit</p>
+            <h2 id="composerTitle">새 습관 심기</h2>
           </div>
+          <p class="section-note">이름과 아이콘만 먼저 적고, 메모와 색은 필요할 때만 더해보세요.</p>
         </div>
-      </aside>
+
+        <form class="habit-form" id="habitForm">
+          <label class="field field-emoji">
+            <span class="field-label">아이콘</span>
+            <input id="habitEmoji" name="emoji" type="text" maxlength="2" placeholder="🌿" autocomplete="off">
+          </label>
+
+          <label class="field field-name">
+            <span class="field-label">습관 이름</span>
+            <input id="habitName" name="name" type="text" maxlength="32" placeholder="예: 물 2리터 마시기" autocomplete="off" required>
+          </label>
+
+          <button type="submit" class="primary-button form-submit">습관 추가</button>
+        </form>
+
+        <details class="detail-panel">
+          <summary class="detail-toggle">메모와 색 더하기</summary>
+          <div class="detail-body">
+            <div class="detail-grid">
+              <label class="field">
+                <span class="field-label">짧은 설명</span>
+                <input id="habitNote" name="note" type="text" maxlength="80" placeholder="왜 이 습관을 이어가고 싶은지 한 줄로 적어보세요." autocomplete="off">
+              </label>
+
+              <label class="field">
+                <span class="field-label">분위기 색</span>
+                <select id="habitColor" name="color">
+                  <option value="mint">민트빛</option>
+                  <option value="sunset">노을빛</option>
+                  <option value="citrus">햇살빛</option>
+                  <option value="berry">베리빛</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div class="preset-row" aria-label="빠른 습관 예시">
+          <button type="button" class="preset-chip" data-emoji="💧" data-name="물 2리터 마시기" data-note="몸이 가벼워지는 기본 루틴" data-color="mint">💧 수분</button>
+          <button type="button" class="preset-chip" data-emoji="📚" data-name="20분 책 읽기" data-note="짧아도 매일 읽는 시간" data-color="berry">📚 독서</button>
+          <button type="button" class="preset-chip" data-emoji="🧘" data-name="5분 스트레칭" data-note="몸을 부드럽게 깨우는 시작" data-color="sunset">🧘 스트레칭</button>
+          <button type="button" class="preset-chip" data-emoji="🌙" data-name="자기 전 일기 쓰기" data-note="하루를 조용히 정리하는 시간" data-color="citrus">🌙 일기</button>
+        </div>
+      </section>
+
+      <section class="week-card" aria-labelledby="weekTitle">
+        <div class="section-head section-head-tight">
+          <div>
+            <p class="section-kicker">Weekly Flow</p>
+            <h2 id="weekTitle">이번 주 정원 흐름</h2>
+          </div>
+          <p class="section-note">이번 주 전체 체크 흐름을 한눈에 볼 수 있어요.</p>
+        </div>
+        <ul class="week-overview" id="weekOverview"></ul>
+      </section>
     </section>
   </main>
 
